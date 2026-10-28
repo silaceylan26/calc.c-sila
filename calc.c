@@ -1,7 +1,7 @@
 // Name and Surname : Hatice Sila Ceylan <251ADB129>
-// Github Repository :
+// Github Repository : https://github.com/silaceylan26/calc.c-sila
 // Compile with : gcc -O2 -Wall -Wextra -std=c17 -o calc calc.c -lm
-// Resources used : AI tool (claude) link :
+// Resources used : AI tool (claude) link : https://claude.ai/share/15c147dc-f039-4128-bd00-6e66ea3acf36
 
 #define STUDENT_NAME     "Hatice Sila"
 #define STUDENT_LASTNAME "Ceylan"
@@ -15,8 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-
-
 
 
 static void *xmalloc(size_t n) {
@@ -84,7 +82,9 @@ typedef struct {
 } Parser;
 
 
-
+// We track positions using pointer arithmetic (current pointer minus the start 
+// of the text buffer). This avoids costly index lookups and allows O(1) 
+// position tracking across large files.
 static void next_token(Parser *ps) {
     char *p = ps->p;
     while (*p == ' ' || *p == '\t') p++;
@@ -155,7 +155,7 @@ static unsigned long long ipow(unsigned long long base, unsigned long long exp) 
     return result;
 }
 
-
+// Errors are reported at the token's start to satisfy the 1-based position requirement.
 static int fail(Parser *ps, const char *at) {
     ps->err_pos = (size_t)(at - ps->text) + 1;
     ps->failed = 1;
@@ -231,6 +231,8 @@ static int parse_primary(Parser *ps, Value *out) {
     return fail(ps, t.start);
 }
 
+// Calls itself recursively it makes ** right-associative so that
+// 2**3**2 groups as 2**(3**2) rather than (2**3)**2
 static int parse_power(Parser *ps, Value *out) {
     Value left;
     if (!parse_primary(ps, &left)) return 0;
